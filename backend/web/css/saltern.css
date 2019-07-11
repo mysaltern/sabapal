@@ -1,0 +1,56 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : Oct 11, 2017, 3:29:57 PM
+    Author     : saltern
+*/
+
+
+.leftPage
+
+{
+    text-align: left;
+  
+}
+
+
+.yekan
+{
+    font-family: 'Yekan';
+}
+
+.size19
+{
+    font-size: 19px;
+}
+
+.khat
+
+{
+    width: 100%;
+    height: 3px;
+    background-color: grey;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    position: relative;
+    clear: both;
+}
+
+.tire
+{
+     
+}
+
+.space
+
+{
+    
+    position: relative;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    border-bottom: grey dashed thick;
+    clear: both;
+}

@@ -1,0 +1,54 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Author     : Hossein Roshan
+*/
+
+body {
+    direction: rtl;
+}
+.ltr {
+    direction: ltr;
+}
+.rtl{
+    direction: rtl;
+}
+.footer_nav {
+    margin: 0px auto;
+}
+
+.navtop{
+    margin-top:50px;
+}
+.tab-content {
+    padding: 40px;
+    margin-top: -20px; 
+}
+
+.container-frame {
+    margin-top: 150px;
+    padding-bottom: 80px;
+    border-bottom: solid 1px #ebebeb;
+}
+
+.card-product {
+    padding: 5px;
+}
+
+.card-product:hover {
+    box-shadow: 0 25px 29px rgba(63, 78, 100, 0.15);
+    border: solid 1px rgba(235,235,235,1);
+    background-color: #fff;
+}
+
+.img-wrap {
+    min-height: 200px;
+    text-align: center;
+}
+.img-wrap img {
+    max-height: 200px;
+    max-width: 100%;
+}
