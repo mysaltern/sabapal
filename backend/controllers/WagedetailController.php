@@ -39,33 +39,6 @@ class WagedetailController extends Controller
         }
 
 
-    //   function for calculate wage
-//    public function Wage($wagename, $date, $price)
-//        {
-//
-//
-//        $wage = Wage::find()->asArray()->where(['name' => $wagename])->one();
-//        $wagedetail = Wagedetail::find()->asArray()->where(new BetweenColumnsCondition($price, 'BETWEEN', 'startprice', 'endprice'))->andWhere(['date' => $date, 'wage_id' => $wage['id']])->one();
-//
-//        $fixpercent = $wagedetail ['fixpercent'];
-//        $varpercent = $wagedetail ['varpercent'];
-//
-//        if ($fixpercent && $varpercent)
-//            {
-//            return " $fixpercent , $varpercent";
-//            }
-//        elseif ($fixpercent)
-//            {
-//            return $fixpercent;
-//            }
-//        elseif ($varpercent)
-//            {
-//            return $varpercent;
-//            }
-//
-//        }
-
-
     /**
      * Lists all Wagedetail models.
      * @return mixed
