@@ -97,12 +97,12 @@ class Wage extends \yii\db\ActiveRecord
         if ($fixpercent)
             {
             $pricewhitefixpercent = $price - $fixpercent;
-            return " price white fixpercent :  $pricewhitefixpercent";
+            return " Fix Wage : $fixpercent  ,<br>  Price White Fix Wage  :  $pricewhitefixpercent ";
             }
         elseif ($varpercent)
             {
             $pricewhitevarpercent = $price - ( $price * ( $varpercent / 100));
-            return " price white varpercent :  $pricewhitevarpercent";
+            return "Var Wage : %$varpercent ,<br> Price White Var Wage :  $pricewhitevarpercent";
             }
         else
             {
