@@ -50,6 +50,8 @@ AppAsset::register($this);
                 $menuItems[] = ['label' => 'درخواست تسویه', 'url' => ['/settlement/index']];
                 $menuItems[] = ['label' => 'تراکنش ها', 'url' => ['/transaction/index']];
                 $menuItems[] = ['label' => 'کاربران', 'url' => ['/user/admin']];
+                $menuItems[] = ['label' => 'کارمزد', 'url' => ['/wage/index']];
+                $menuItems[] = ['label' => 'نوع کارمزد', 'url' => ['/wagedetail/index']];
                 $menuItems[] = '<li>'
                         . Html::beginForm(['/user/security/logout'], 'post')
                         . Html::submitButton(
