@@ -27,7 +27,7 @@ class ApiController extends Controller
                 'class' => \yii\filters\AccessControl::className(),
                 'rules' => [
                     [
-                        'actions' => ['virtual', 'test', 'accept', 'render', 'response','responsesaderat', 'verify'],
+                        'actions' => ['virtual', 'test', 'accept', 'render', 'response', 'responsesaderat', 'verify'],
                         'allow' => true,
 //                        'roles' => ['*'],
                     ]
@@ -38,20 +38,23 @@ class ApiController extends Controller
 
     public function actionVirtual()
     {
-		
-		
+
+
+
         \Yii::$app->response->format = \yii\web\Response:: FORMAT_JSON;
 
 
         $attributes = \yii::$app->request->post();
-		$check	=count($attributes);
-		if($check ==0)
-		{
-			   return array('status' => '-8', 'description' => 'اطلاعات حتما از طریق بادی و متد پست ارسال شود');
-				exit();
-		}
+        $check = count($attributes);
+        if ($check == 0)
+        {
+            return array('status' => '-8', 'description' => 'اطلاعات حتما از طریق بادی و متد پست ارسال شود');
+            exit();
+        }
+
 
         $CallbackURL = $attributes['CallbackURL'];
+
         $MerchantID = $attributes['MerchantID'];
         $Amount = $attributes['Amount'] * 10;
         $Description = $attributes['Description'];
@@ -64,16 +67,24 @@ class ApiController extends Controller
 
 
 
-
         $ip = Yii::$app->getRequest()->getUserIP();
 
-        $internal = \common\models\InternalPay::find()->where(['ip' => $ip, 'active' => 1, 'deleted' => 0])->asArray()->one();
- 
+
+        $internal = \common\models\InternalPay::find()->where(['ip' => $ip, 'private_code' => $MerchantID, 'active' => 1, 'deleted' => 0])->asArray()->one();
+
         $private = $internal['private_code'];
         $userID = $internal['userID'];
-
-
-
+        if (is_null($userID))
+        {
+            return array('Status' => '-5', 'description' => 'مرچنت کد شما اشتباه وارد شده است یا اینن که آی پی شما تغییر کرده است');
+            exit();
+        }
+        $urlTest = Yii::$app->Security->checkBlock($userID);
+        if ($urlTest == false)
+        {
+            return array('Status' => '-6', 'description' => 'کاربری شما مسدود شده است');
+            exit();
+        }
 
         if (empty($attributes))
         {
@@ -135,13 +146,13 @@ class ApiController extends Controller
                 $model->userID = $userID;
                 $model->date = time();
                 $model->status = -1;
-			  
+
 
                 $model->amount = $amount;
                 $model->deleted = 0;
                 $model->save(false);
-				$model->cck = Yii::$app->Security->generate($userID,$amount, $model->id);
-				$model->save(false);
+                $model->cck = Yii::$app->Security->generate($userID, $amount, $model->id);
+                $model->save(false);
 
                 $callback = new \common\models\TransactionCallback;
                 $callback->transaction_id = $model->id;
@@ -166,159 +177,142 @@ class ApiController extends Controller
         }
     }
 
+    public function actionResponsesaderat()
+    {
 
-	public function actionResponsesaderat()
-		{
-		 
-		 
-				$resCode = $_POST['respcode']; 
-	 
-		  
-				$respmsg = $_POST['respmsg'];
-				$terminalid = $_POST['terminalid'];
-				$OrderId = $_POST['invoiceid'];
-				$amount = $_POST['amount'];
-		  
-				
-			   $ip = Yii::$app->getRequest()->getUserIP();
-			   $post= $_POST;
-			   		 
-				$url = \common\models\TransactionCallback::urlWithOrder($OrderId);
-  
-				if ($resCode == -1 or !isset($post['rrn']))
-						{
-							
-						
-							
-							\Yii::$app->getSession()->setFlash('faildTrancaction', 'پرداخت شما   انجام نشد  ');
 
-							header("Location:$url?Status=-1");
-							die;
-							exit;
-						}
-     /*   $trans = Transaction::checkWithTokenBankIPBlock($Token);
+        $resCode = $_POST['respcode'];
 
-        if ($trans == false)
+
+        $respmsg = $_POST['respmsg'];
+        $terminalid = $_POST['terminalid'];
+        $OrderId = $_POST['invoiceid'];
+        $amount = $_POST['amount'];
+
+
+        $ip = Yii::$app->getRequest()->getUserIP();
+        $post = $_POST;
+
+        $url = \common\models\TransactionCallback::urlWithOrder($OrderId);
+
+        if ($resCode == -1 or ! isset($post['rrn']))
         {
-            $url = \common\models\TransactionCallback::urlWithOrder($OrderId);
-            header("Location:$url?status=-1");
+
+
+
+            \Yii::$app->getSession()->setFlash('faildTrancaction', 'پرداخت شما   انجام نشد  ');
+
+            header("Location:$url?Status=-1");
             die;
             exit;
         }
-*/
+        /*   $trans = Transaction::checkWithTokenBankIPBlock($Token);
+
+          if ($trans == false)
+          {
+          $url = \common\models\TransactionCallback::urlWithOrder($OrderId);
+          header("Location:$url?status=-1");
+          die;
+          exit;
+          }
+         */
 
 
-				$rrn = $post['rrn'];
-				$cardnumber = $post['cardnumber'];
-				$tracenumber = $post['tracenumber'];
-				$Token = $post['digitalreceipt'];
-				$payload = $post['payload'];
-				$datepaid = $post['datepaid'];
-				$issuerbank = $post['issuerbank'];
-				$OrderId = $post['invoiceid'];
+        $rrn = $post['rrn'];
+        $cardnumber = $post['cardnumber'];
+        $tracenumber = $post['tracenumber'];
+        $Token = $post['digitalreceipt'];
+        $payload = $post['payload'];
+        $datepaid = $post['datepaid'];
+        $issuerbank = $post['issuerbank'];
+        $OrderId = $post['invoiceid'];
 
 
-      //  $return = $meli->verify($OrderId, $Token, $ResCode);
+        //  $return = $meli->verify($OrderId, $Token, $ResCode);
 
 
- 
 
 
-                $transID = \common\models\Transaction::findOne(['id' => $OrderId]);
- 
-                {
-					$terminal= '61001187';
-					$params ='digitalreceipt='.$Token.'&Tid='.$terminal;
-				$ch = curl_init();
-				curl_setopt($ch, CURLOPT_URL, 'https://mabna.shaparak.ir:8081/V1/PeymentApi/Advice');
-				curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
-				curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-				curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-				$res = curl_exec($ch);
-				curl_close($ch);
-				$result = json_decode($res,true);
-		 
 
-				 if (strtoupper($result['Status']) == 'OK') 
-				 {
-					 
-					 
-					 
-	
-  
-	 
+        $transID = \common\models\Transaction::findOne(['id' => $OrderId]);
+        {
+            $terminal = '61001187';
+            $params = 'digitalreceipt=' . $Token . '&Tid=' . $terminal;
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, 'https://mabna.shaparak.ir:8081/V1/PeymentApi/Advice');
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            $res = curl_exec($ch);
+            curl_close($ch);
+            $result = json_decode($res, true);
 
-            if ($transID->amount == $result['ReturnId'])
+
+            if (strtoupper($result['Status']) == 'OK')
             {
 
-      
 
 
-						$rrn = $post['rrn'];
-						$cardnumber = $post['cardnumber'];
-						$tracenumber = $post['tracenumber'];
-						$digitalreceipt = $post['digitalreceipt'];
-						$payload = $post['payload'];
-						$datepaid = $post['datepaid'];
-						$issuerbank = $post['issuerbank'];
-
-
-						$bank = new \common\models\BankLog();
-					 //   $bank->id = $bankID['id'];
-					 //   $bank->isNewRecord = false; 
-						$bank->amount = $transID->amount;
-						$bank->auth = $digitalreceipt;
-						$bank->response = $cardnumber;
-						$bank->SystemTraceNo = $tracenumber;
-						$bank->RetrivalRefNo = $rrn;
-						$bank->date = time(); 
-						$bank->response = $payload;
-						$bank->save(false);
-					//    $bank->update(false, ['SystemTraceNo', 'RetrivalRefNo','auth', 'date', 'response', 'amount']);
-
-
-
-
-
-
-
-
-
-
-
-             //   $transID = \common\models\Transaction::findOne(['id' => $order]);
-
-              //  if ($OrderId == $order)
+                if ($transID->amount == $result['ReturnId'])
                 {
 
-                    $model = new \common\models\Transaction();
-                    $model->id = $OrderId;
-                    $model->isNewRecord = false;
-                    $model->status = 1;
-                    $model->sourceID = $bank->id;
-                    $model->sourceTypeID = 1;
-                    $model->bankLogID = $bank->id;
-                    $model->deleted = 0;
-                //    $model->cck = Yii::$app->Security->generate(Yii::$app->user->id, $money, $model->id);
 
-                    $model->update(false, ['status', 'sourceTypeID', 'bankLogID', 'sourceID']);
 
-                   
-                  
-                    header("Location:$url&Status=OK&Authority=$digitalreceipt&RefID=$OrderId");
-                    die;
-						}
-					}
-				}
-		 
-			 if (strtoupper($result['Status']) == 'DUPLICATE') 
-			 {
-			   	  header("Location:$url?Status=5");
-					die;
-					exit;
-			 }
-			} 
-		}
+
+                    $rrn = $post['rrn'];
+                    $cardnumber = $post['cardnumber'];
+                    $tracenumber = $post['tracenumber'];
+                    $digitalreceipt = $post['digitalreceipt'];
+                    $payload = $post['payload'];
+                    $datepaid = $post['datepaid'];
+                    $issuerbank = $post['issuerbank'];
+
+
+                    $bank = new \common\models\BankLog();
+                    //   $bank->id = $bankID['id'];
+                    //   $bank->isNewRecord = false;
+                    $bank->amount = $transID->amount;
+                    $bank->auth = $digitalreceipt;
+                    $bank->response = $cardnumber;
+                    $bank->SystemTraceNo = $tracenumber;
+                    $bank->RetrivalRefNo = $rrn;
+                    $bank->date = time();
+                    $bank->response = $payload;
+                    $bank->save(false);
+                    //    $bank->update(false, ['SystemTraceNo', 'RetrivalRefNo','auth', 'date', 'response', 'amount']);
+                    //   $transID = \common\models\Transaction::findOne(['id' => $order]);
+                    //  if ($OrderId == $order)
+                    {
+
+                        $model = new \common\models\Transaction();
+                        $model->id = $OrderId;
+                        $model->isNewRecord = false;
+                        $model->status = 1;
+                        $model->sourceID = $bank->id;
+                        $model->sourceTypeID = 1;
+                        $model->bankLogID = $bank->id;
+                        $model->deleted = 0;
+                        //    $model->cck = Yii::$app->Security->generate(Yii::$app->user->id, $money, $model->id);
+
+                        $model->update(false, ['status', 'sourceTypeID', 'bankLogID', 'sourceID']);
+
+
+
+                        header("Location:$url?Status=OK&Authority=$digitalreceipt&RefID=$OrderId");
+                        die;
+                    }
+                }
+            }
+
+            if (strtoupper($result['Status']) == 'DUPLICATE')
+            {
+                header("Location:$url?Status=5");
+                die;
+                exit;
+            }
+        }
+    }
+
     public function actionAccept()
     {
         \Yii::$app->response->format = \yii\web\Response:: FORMAT_JSON;
@@ -364,35 +358,35 @@ class ApiController extends Controller
         $ip = Yii::$app->getRequest()->getUserIP();
 
         $check = Transaction::checkWithTokenIPBlock($Token);
-	    $orderId =  $check['id'] ; 
-	   $method = Transaction::checkMethod();
-	 
-		 
-		if($method==false)
-		{ 
-		return	Yii::$app->response->redirect(['transaction/rooter','Token' => $Token,'orderId'=>$orderId]);
-		exit;
-		}
-		 
-		
-		 $amount =  $check['amount'] ; 
- 
- 
-		
-			$url = 'https://mabna.shaparak.ir:8080/Pay';
-		 
-			$terminal= '61001187';
-			$redirectAddress= 'https://sabapal.ir/sabapal/frontend/web/api/responsesaderat';
-			
-			$invoiceNumber= $orderId;
-			   
-			   
-			   
-					echo $setPayment = '<form id="paymentUTLfrm" action="https://mabna.shaparak.ir:8080" method="POST">
-					<input type="hidden" id="TerminalID" name="TerminalID" value="'.$terminal.'">
-					<input type="hidden" id="Amount" name="Amount" value="'.$amount.'">
-					<input type="hidden" id="callbackURL" name="callbackURL" value="'.$redirectAddress.'">
-					<input type="hidden" id="InvoiceID" name="InvoiceID" value="'.$invoiceNumber.'">
+        $orderId = $check['id'];
+        $method = Transaction::checkMethod();
+
+
+        if ($method == false)
+        {
+            return Yii::$app->response->redirect(['transaction/rooter', 'Token' => $Token, 'orderId' => $orderId]);
+            exit;
+        }
+
+
+        $amount = $check['amount'];
+
+
+
+        $url = 'https://mabna.shaparak.ir:8080/Pay';
+
+        $terminal = '61001187';
+        $redirectAddress = 'https://sabapal.ir/sabapal/frontend/web/api/responsesaderat';
+
+        $invoiceNumber = $orderId;
+
+
+
+        echo $setPayment = '<form id="paymentUTLfrm" action="https://mabna.shaparak.ir:8080" method="POST">
+					<input type="hidden" id="TerminalID" name="TerminalID" value="' . $terminal . '">
+					<input type="hidden" id="Amount" name="Amount" value="' . $amount . '">
+					<input type="hidden" id="callbackURL" name="callbackURL" value="' . $redirectAddress . '">
+					<input type="hidden" id="InvoiceID" name="InvoiceID" value="' . $invoiceNumber . '">
 					<input type="hidden" id="Payload" name="Payload" value="">
 					</form><script>
 					function submitmabna() {
@@ -400,12 +394,11 @@ class ApiController extends Controller
 					}
 					window.onload=submitmabna; </script>';
 
-					exit;
- 
- 
- 
-     //   $meli = new \common\models\Meli();
+        exit;
 
+
+
+        //   $meli = new \common\models\Meli();
         //$meli->request($check['amount'], "https://sabapal.ir/sabapal/frontend/web/api/response3", $check['id']);
     }
 
@@ -499,7 +492,7 @@ class ApiController extends Controller
                     $model->sourceTypeID = 1;
                     $model->bankLogID = $bank->id;
                     $model->deleted = 0;
-                //    $model->cck = Yii::$app->Security->generate(Yii::$app->user->id, $money, $model->id);
+                    //    $model->cck = Yii::$app->Security->generate(Yii::$app->user->id, $money, $model->id);
 
                     $model->update(false, ['status', 'sourceTypeID', 'bankLogID', 'sourceID']);
 
@@ -507,7 +500,7 @@ class ApiController extends Controller
 
                     $tokenInternal = $trans['token'];
 
-                    header("Location:$url&Status=OK&Authority=$tokenInternal&RefID=$OrderId");
+                    header("Location:$url?Status=OK&Authority=$tokenInternal&RefID=$OrderId");
                     die;
                 }
             }
@@ -523,8 +516,29 @@ class ApiController extends Controller
         $private = $_POST["private_code"];
 
         $token = $_POST["token"];
-        $money = $_POST["money"];
+        $money = (int) $_POST["money"];
+
+
+
         $ip = Yii::$app->getRequest()->getUserIP();
+        $internal = \common\models\InternalPay::find()->where(['ip' => $ip, 'private_code' => $private, 'active' => 1, 'deleted' => 0])->asArray()->one();
+
+        $private = $internal['private_code'];
+        $userID = $internal['userID'];
+        if (is_null($userID))
+        {
+            return array('Status' => '-5', 'description' => 'مرچنت کد شما اشتباه وارد شده است یا اینن که آی پی شما تغییر کرده است');
+            exit();
+        }
+        $urlTest = Yii::$app->Security->checkBlock($userID);
+        if ($urlTest == false)
+        {
+            return array('Status' => '-6', 'description' => 'کاربری شما مسدود شده است');
+            exit();
+        }
+
+
+
 
         $check = Transaction::checkVerify($token, $money, $private, $ip);
 

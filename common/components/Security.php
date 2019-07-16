@@ -4,9 +4,9 @@
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
- 
-   $urlTest = Yii::$app->security->checkBlock($userID);
- 
+
+  $urlTest = Yii::$app->security->checkBlock($userID);
+
  */
 
 namespace common\components;
@@ -24,8 +24,8 @@ class Security extends Component
         $token = $userID * $id;
 
         $data = Yii::$app->getSecurity()->validateData($cck, $token);
- 
- 
+
+
         if ($data != false)
         {
             return true;
@@ -39,7 +39,7 @@ class Security extends Component
     public function generate($userID, $money, $id)
     {
         $token = $userID * $id;
- 
+
         $data = Yii::$app->getSecurity()->hashData($money, $token);
         return $data;
     }
@@ -50,19 +50,28 @@ class Security extends Component
                 ->update('user', ['blocked_at' => time()], "id = $userID")
                 ->execute();
     }
-	   public function updateRecord($table,$id,$value)
+
+    public function updateRecord($table, $id, $value)
     {
         Yii::$app->db->createCommand()
                 ->update("$table", ['active' => $value], "id = $id")
                 ->execute();
     }
-	public function checkBlock($userID)
-	
-	{
-		   $user = \dektrium\user\models\User::find()->where("id=  $userID")->one();
-			var_dump($user);
-			die;
-	}
+
+    public function checkBlock($userID)
+    {
+        $user = \dektrium\user\models\User::find()->where(["id" => $userID])->one();
+        $time = $user['blocked_at'];
+        if ($time == null)
+        {
+            //block nist
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
 
 }
 

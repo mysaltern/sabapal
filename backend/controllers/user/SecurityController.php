@@ -26,6 +26,7 @@ use yii\helpers\Url;
 use yii\web\Controller;
 use yii\web\Response;
 use Yii;
+
 /**
  * Controller that manages user authentication process.
  *
@@ -109,8 +110,8 @@ class SecurityController extends Controller
             'access' => [
                 'class' => AccessControl::className(),
                 'rules' => [
-                        ['allow' => true, 'actions' => ['login', 'auth', 'logout'], 'roles' => ['?']],
-                        ['allow' => true, 'actions' => ['login', 'auth', 'logout'], 'roles' => ['@']],
+                    ['allow' => true, 'actions' => ['login', 'auth', 'logout'], 'roles' => ['?']],
+                    ['allow' => true, 'actions' => ['login', 'auth', 'logout'], 'roles' => ['@']],
                 ],
             ],
             'verbs' => [
@@ -146,7 +147,7 @@ class SecurityController extends Controller
         {
             $this->goHome();
         }
-		
+
         /** @var LoginForm $model */
         $model = \Yii::createObject(LoginForm::className());
         $event = $this->getFormEvent($model);
@@ -157,27 +158,25 @@ class SecurityController extends Controller
 
         if ($model->load(\Yii::$app->getRequest()->post()) && $model->login())
         {
-			 if ( \Yii::$app->user->id==1)
-				{
-				 
-					
-					// yes he is Admin, so redirect page 
-					return $this->goBack();
-				}
-			  else // if he is not an Admin then what :P
-				{   // put him out :P Automatically logout. 
-			 
-				
-				$id = \Yii::$app->user->id;
-				 Yii::$app->db->createCommand()
-                ->update('user', ['blocked_at' => time()], "id = $id")
-                ->execute();
-					Yii::$app->user->logout();
-					// set error on login page. 
-					\Yii::$app->getSession()->setFlash('error', 'You are not authorized to login Admin\'s penal.<br /> Please use valid Username & Password.<br />Please contact Administrator for details.');
-					//redirect again page to login form.
-					return $this->redirect(['site/login']);
-				}
+            if (\Yii::$app->user->id == 1)
+            {
+
+
+                // yes he is Admin, so redirect page
+                return $this->goBack();
+            }
+            else // if he is not an Admin then what :P
+            {   // put him out :P Automatically logout.
+                $id = \Yii::$app->user->id;
+                Yii::$app->db->createCommand()
+                        ->update('user', ['blocked_at' => time()], "id = $id")
+                        ->execute();
+                Yii::$app->user->logout();
+                // set error on login page.
+                \Yii::$app->getSession()->setFlash('error', 'You are not authorized to login Admin\'s penal.<br /> Please use valid Username & Password.<br />Please contact Administrator for details.');
+                //redirect again page to login form.
+                return $this->redirect(['site/login']);
+            }
             $this->trigger(self::EVENT_AFTER_LOGIN, $event);
             return $this->goBack();
         }

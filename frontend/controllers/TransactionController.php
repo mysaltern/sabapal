@@ -42,16 +42,16 @@ class TransactionController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::className(),
-                'only' => ['create','pic','responsesaderat','responsesaderat','create2','wallet','create3', 'pay', 'request', 'responsereq', 'index', 'clearing', 'transfer', 'response', 'response2'],
+                'only' => ['create', 'pic', 'responsesaderat', 'responsesaderat', 'create2', 'wallet', 'create3', 'pay', 'request', 'responsereq', 'index', 'clearing', 'transfer', 'response', 'response2'],
                 'rules' => [
                     [
                         'allow' => true,
-                        'actions' => ['pay','pic','responsetosaderat', 'responsereq','responsereqsaderat'],
+                        'actions' => ['pay', 'pic', 'responsetosaderat', 'responsereq', 'responsereqsaderat'],
                         'roles' => ['?', '@'],
                     ],
                     [
                         'allow' => true,
-                        'actions' => ['create','responsesaderat','create2','create3','wallet', 'request', 'index', 'clearing', 'transfer', 'response', 'response2'],
+                        'actions' => ['create', 'responsesaderat', 'create2', 'create3', 'wallet', 'request', 'index', 'clearing', 'transfer', 'response', 'response2'],
                         'roles' => ['@'],
                     ],
                 ],
@@ -65,14 +65,13 @@ class TransactionController extends Controller
      */
     public function actionIndex()
     {
-  
+
 //        $data = Yii::$app->Data->merchent(Yii::$app->user->id);
-  //      $data = Yii::$app->Data->acceptors(Yii::$app->user->id);
+        //      $data = Yii::$app->Data->acceptors(Yii::$app->user->id);
 //        var_dump($data);
 //        die;
-
-// echo $_SERVER['SERVER_ADDR']; 
- //die;
+// echo $_SERVER['SERVER_ADDR'];
+        //die;
         $money = Yii::$app->ReadHttpHeader->money(Yii::$app->user->id);
 
 
@@ -97,48 +96,48 @@ class TransactionController extends Controller
                     'model' => $this->findModel($id),
         ]);
     }
-	
-	public function actionWallet()
-	{
-		
-				$token  = $_GET['Token'];
-			    $toArr =Transaction::getUserIdWithToken($token);
-				$to = $toArr['userID'];
-			    $check = Transaction::transfering(\Yii::$app->user->id,$to, $toArr['amount'],true);
-				
-				if($check==true)
-				{
-					$url = \common\models\TransactionCallback::urlWithOrder($toArr['id']);
-					$orderID = $toArr['id']; 
-                    header("Location:$url&Status=OK&Authority=$token&RefID=$orderID");
-                    die;
-				}
 
-	}
-	public function actionRooter()
+    public function actionWallet()
     {
-		
-	
-		
-		
-	 	if(isset($_POST['method']))
-		{
-			$token  = $_GET['Token'];
-			 return $this->redirect(['wallet', 'Token' => $token]);
-			
-		}
-		
-		
+
+        $token = $_GET['Token'];
+        $toArr = Transaction::getUserIdWithToken($token);
+        $to = $toArr['userID'];
+        $check = Transaction::transfering(\Yii::$app->user->id, $to, $toArr['amount'], true);
+
+        if ($check == true)
+        {
+            $url = \common\models\TransactionCallback::urlWithOrder($toArr['id']);
+            $orderID = $toArr['id'];
+            header("Location:$url?Status=OK&Authority=$token&RefID=$orderID");
+            die;
+        }
+    }
+
+    public function actionRooter()
+    {
+
+
+
+
+        if (isset($_POST['method']))
+        {
+            $token = $_GET['Token'];
+            return $this->redirect(['wallet', 'Token' => $token]);
+        }
+
+
         return $this->render('rooter');
     }
-	
-	public function actionPic()
-	{
-		
-		  $this->layout = false;
-		
-		  return $this->render('pic');
-	}
+
+    public function actionPic()
+    {
+
+        $this->layout = false;
+
+        return $this->render('pic');
+    }
+
     public function actionRequest()
     {
 
@@ -160,7 +159,7 @@ class TransactionController extends Controller
         {
 
 
- 
+
             if ($model->validate())
             {
 
@@ -169,9 +168,9 @@ class TransactionController extends Controller
                 $model->status = -1;
                 $model->sourceTypeID = 6;
                 $model->sourceID = $model->goal;
-               $model->save(false);
+                $model->save(false);
                 $mobile = \common\models\MobilePhone::getMobile($model->userID);
-			 
+
                 $modelID = \common\models\Transaction::findOne(['id' => $model->id]);
 
                 $text = "مشترک  $mobile از شما درخواست $modelID->amount ریال را کرده است . برای پردخت لطفا روی لینک زیر کلیک کنید";
@@ -223,58 +222,55 @@ class TransactionController extends Controller
             ]);
         }
     }
-	
-	
-	
-	public function actionCreate3()
-	
-	{
-		
-	 	
-		
-		
-			$model = new Transaction();
-		   if ($model->load(Yii::$app->request->post()))
-			{
-			
-			
-			$model->userID = Yii::$app->user->id;
+
+    public function actionCreate3()
+    {
+
+
+
+
+        $model = new Transaction();
+        if ($model->load(Yii::$app->request->post()))
+        {
+
+
+            $model->userID = Yii::$app->user->id;
             $model->date = time();
             $model->status = -1;
             $model->sourceTypeID = 1;
-           
+
             $model->save(false);
 
 
-			$amount= $model->amount;
+            $amount = $model->amount;
 
-			$bank = new \common\models\BankLog;
+            $bank = new \common\models\BankLog;
             $bank->amount = $amount;
 
             $bank->date = time();
-       
-			$bank->userID = \Yii::$app->user->id;
-        
+
+            $bank->userID = \Yii::$app->user->id;
+
             $bank->orderID = $model->id;
             $bank->externalPayID = 3;
             $bank->save(false);
 
 
-		
-			$url = 'https://mabna.shaparak.ir:8080/Pay';
-		 
-			$terminal= '61001187';
-			$redirectAddress= 'https://sabapal.ir/sabapal/frontend/web/transaction/responsesaderat';
-			
-			$invoiceNumber=  $model->id;
-			   
-			   
-			   
-					echo $setPayment = '<form id="paymentUTLfrm" action="https://mabna.shaparak.ir:8080" method="POST">
-					<input type="hidden" id="TerminalID" name="TerminalID" value="'.$terminal.'">
-					<input type="hidden" id="Amount" name="Amount" value="'.$amount.'">
-					<input type="hidden" id="callbackURL" name="callbackURL" value="'.$redirectAddress.'">
-					<input type="hidden" id="InvoiceID" name="InvoiceID" value="'.$invoiceNumber.'">
+
+            $url = 'https://mabna.shaparak.ir:8080/Pay';
+
+            $terminal = '61001187';
+            $redirectAddress = 'https://sabapal.ir/sabapal/frontend/web/transaction/responsesaderat';
+
+            $invoiceNumber = $model->id;
+
+
+
+            echo $setPayment = '<form id="paymentUTLfrm" action="https://mabna.shaparak.ir:8080" method="POST">
+					<input type="hidden" id="TerminalID" name="TerminalID" value="' . $terminal . '">
+					<input type="hidden" id="Amount" name="Amount" value="' . $amount . '">
+					<input type="hidden" id="callbackURL" name="callbackURL" value="' . $redirectAddress . '">
+					<input type="hidden" id="InvoiceID" name="InvoiceID" value="' . $invoiceNumber . '">
 					<input type="hidden" id="Payload" name="Payload" value="">
 					</form><script>
 					function submitmabna() {
@@ -282,150 +278,125 @@ class TransactionController extends Controller
 					}
 					window.onload=submitmabna; </script>';
 
-					exit;
-	   
-	
-		}
-	
-		
-		 return $this->render('create', [
-                         'model' => $model,
-            ]);
-		
-	}
-	
-	
-	
-	public function actionResponsesaderat()
-	
-	{
-	
+            exit;
+        }
+
+
+        return $this->render('create', [
+                    'model' => $model,
+        ]);
+    }
+
+    public function actionResponsesaderat()
+    {
 
 
 
 
 
-	
-			$post=	$_POST;
-			 
 
-			$respcode = $post['respcode'];
-			$respmsg = $post['respmsg'];
-			$terminalid = $post['terminalid'];
-			$invoiceid = $post['invoiceid'];
-			$amount = $post['amount'];
-			if($respcode==0)
-			{
-				$rrn = $post['rrn'];
-				$cardnumber = $post['cardnumber'];
-				$tracenumber = $post['tracenumber'];
-				$digitalreceipt = $post['digitalreceipt'];
-				$payload = $post['payload'];
-				$datepaid = $post['datepaid'];
-				$issuerbank = $post['issuerbank'];
-				
-				$bankID = \common\models\BankLog::findOne(['orderID' => $invoiceid, 'userID' => Yii::$app->user->id]);
 
- 
+        $post = $_POST;
+
+
+        $respcode = $post['respcode'];
+        $respmsg = $post['respmsg'];
+        $terminalid = $post['terminalid'];
+        $invoiceid = $post['invoiceid'];
+        $amount = $post['amount'];
+        if ($respcode == 0)
+        {
+            $rrn = $post['rrn'];
+            $cardnumber = $post['cardnumber'];
+            $tracenumber = $post['tracenumber'];
+            $digitalreceipt = $post['digitalreceipt'];
+            $payload = $post['payload'];
+            $datepaid = $post['datepaid'];
+            $issuerbank = $post['issuerbank'];
+
+            $bankID = \common\models\BankLog::findOne(['orderID' => $invoiceid, 'userID' => Yii::$app->user->id]);
             {
                 $bank = new \common\models\BankLog();
                 $bank->id = $bankID['id'];
-                $bank->isNewRecord = false; 
-				$bank->auth = $digitalreceipt;
-				$bank->response = $cardnumber;
+                $bank->isNewRecord = false;
+                $bank->auth = $digitalreceipt;
+                $bank->response = $cardnumber;
                 $bank->SystemTraceNo = $tracenumber;
                 $bank->RetrivalRefNo = $rrn;
-                $bank->date = time(); 
+                $bank->date = time();
                 $bank->response = $payload;
 
-                $bank->update(false, ['SystemTraceNo', 'RetrivalRefNo','auth', 'date', 'response', 'amount']);
+                $bank->update(false, ['SystemTraceNo', 'RetrivalRefNo', 'auth', 'date', 'response', 'amount']);
 
                 $transID = \common\models\Transaction::findOne(['id' => $invoiceid, 'userID' => Yii::$app->user->id]);
- 
                 {
-				$terminal= '61001187';
-				$params ='digitalreceipt='.$digitalreceipt.'&Tid='.$terminal;
-				$ch = curl_init();
-				curl_setopt($ch, CURLOPT_URL, 'https://mabna.shaparak.ir:8081/V1/PeymentApi/Advice');
-				curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
-				curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-				curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-				$res = curl_exec($ch);
-				curl_close($ch);
-				$result = json_decode($res,true);
-				
-				 
-				 if (strtoupper($result['Status']) == 'OK') 
-				 {
+                    $terminal = '61001187';
+                    $params = 'digitalreceipt=' . $digitalreceipt . '&Tid=' . $terminal;
+                    $ch = curl_init();
+                    curl_setopt($ch, CURLOPT_URL, 'https://mabna.shaparak.ir:8081/V1/PeymentApi/Advice');
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
+                    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                    $res = curl_exec($ch);
+                    curl_close($ch);
+                    $result = json_decode($res, true);
+
+
+                    if (strtoupper($result['Status']) == 'OK')
+                    {
 
 
 
-                    $model = new \common\models\Transaction();
-                    $model->id = $invoiceid;
-                    $model->isNewRecord = false;
-                    $model->status = 1;
-                    $model->sourceID = $bank->id;
-                    $model->sourceTypeID = 1;
-                    $model->bankLogID = $bank->id;
-                    $model->deleted = 0;
+                        $model = new \common\models\Transaction();
+                        $model->id = $invoiceid;
+                        $model->isNewRecord = false;
+                        $model->status = 1;
+                        $model->sourceID = $bank->id;
+                        $model->sourceTypeID = 1;
+                        $model->bankLogID = $bank->id;
+                        $model->deleted = 0;
 
 
-                    $model->cck = Yii::$app->Security->generate(Yii::$app->user->id, $bankID->amount, $model->id);
+                        $model->cck = Yii::$app->Security->generate(Yii::$app->user->id, $bankID->amount, $model->id);
 
-                    $model->update(false, ['status', 'sourceTypeID', 'bankLogID', 'cck', 'deleted']);
-
-
-
+                        $model->update(false, ['status', 'sourceTypeID', 'bankLogID', 'cck', 'deleted']);
 
 
 
 
-                    \Yii::$app->getSession()->setFlash('success', 'پرداخت شما با موفقیت انجام شد  ');
-					 
-                    return $this->redirect(['index']);
+
+
+
+                        \Yii::$app->getSession()->setFlash('success', 'پرداخت شما با موفقیت انجام شد  ');
+
+                        return $this->redirect(['index']);
+                    }
+                    else
+                    {
+
+
+                        \Yii::$app->getSession()->setFlash('faild', 'پرداخت شما نا موفق بود');
+
+                        return $this->redirect(['index']);
+                    }
                 }
-				
-				else
-				{
-					
-
-                    \Yii::$app->getSession()->setFlash('faild', 'پرداخت شما نا موفق بود');
-					 
-                    return $this->redirect(['index']);
-					
-				}
-				}
             }
-				
-				
-				
-				
-				
-				
-			}
-			
-			else
-				
-				{
-					
-						   \Yii::$app->getSession()->setFlash('faild', 'پرداخت نا موفق بود');
-                            return $this->redirect(['transaction/create3']);
-                            exit;
-					
-				}
-			
-		
-	
-	
-	
-	}
-	
+        }
+        else
+        {
+
+            \Yii::$app->getSession()->setFlash('faild', 'پرداخت نا موفق بود');
+            return $this->redirect(['transaction/create3']);
+            exit;
+        }
+    }
+
     public function actionCreate2()
     {
-		
+
         $model = new Transaction();
-  
-		$parsian = new \common\models\Parsian();
+
+        $parsian = new \common\models\Parsian();
         if ($model->load(Yii::$app->request->post()))
         {
 
@@ -447,6 +418,7 @@ class TransactionController extends Controller
             ]);
         }
     }
+
     public function actionClearing()
     {
 
@@ -471,12 +443,12 @@ class TransactionController extends Controller
             }
             else
             {
-				$email =  \Yii::$app->user->identity->email ;
-			 
-				 $email = Yii::$app->ReadHttpHeader->getIDwithEmail($email);
- 
+                $email = \Yii::$app->user->identity->email;
+
+                $email = Yii::$app->ReadHttpHeader->getIDwithEmail($email);
+
                 $to = Yii::$app->ReadHttpHeader->getIDwithEmail($email);
- 
+
                 if ($to != false)
                 {
                     \Yii::$app->getSession()->setFlash('faildTrancaction', 'اطلاعات شما کامل نیست');
@@ -500,7 +472,7 @@ class TransactionController extends Controller
 
 
                         $to = Yii::$app->ReadHttpHeader->to(\Yii::$app->user->id, (int) $model->amount);
-						
+
 
                         $json = Yii::$app->ReadHttpHeader->jsonTransaction($to);
                         $trans = Transaction::clearing($model->amount, \Yii::$app->user->id);
@@ -655,22 +627,22 @@ class TransactionController extends Controller
             \Yii::$app->getSession()->setFlash('faildTrancaction', 'مشکلی در پرداخت شما وجود داشت لطفا دوباره امتحان  کنید   ');
             return $this->redirect(['create']);
         }
-		
-	 
+
+
         $OrderId = $_POST["OrderId"];
         $Token = $_POST["Token"];
         $ResCode = $_POST["status"];
         $return = $parsian->verify($OrderId, $Token, $ResCode);
-		  
-        if ( $return  != false)
+
+        if ($return != false)
         {
 
- 
-			$return = $return->ConfirmPaymentResult;
-           
-          //  $money = $return->Amount;
+
+            $return = $return->ConfirmPaymentResult;
+
+            //  $money = $return->Amount;
             $retNo = $return->RRN;
-          //  $order = $return->Token;
+            //  $order = $return->Token;
             $trace = $return->CardNumberMasked;
             $res = $return->Token;
 
@@ -678,14 +650,14 @@ class TransactionController extends Controller
             $bankID = \common\models\BankLog::findOne(['auth' => $Token, 'userID' => Yii::$app->user->id]);
 
 
-          //  if ($bankID['amount'] == $money)
+            //  if ($bankID['amount'] == $money)
             {
 
 
                 $bank = new \common\models\BankLog();
                 $bank->id = $bankID['id'];
                 $bank->isNewRecord = false;
-            //    $bank->amount = $money;
+                //    $bank->amount = $money;
                 $bank->SystemTraceNo = $trace;
                 $bank->RetrivalRefNo = $retNo;
                 $bank->date = time();
@@ -698,7 +670,7 @@ class TransactionController extends Controller
 
                 $transID = \common\models\Transaction::findOne(['id' => $OrderId, 'userID' => Yii::$app->user->id]);
 
-        //        if ($OrderId == $order)
+                //        if ($OrderId == $order)
                 {
 
 
@@ -730,7 +702,6 @@ class TransactionController extends Controller
         }
     }
 
-
     public function actionResponsereqsaderat()
     {
 
@@ -744,52 +715,52 @@ class TransactionController extends Controller
             \Yii::$app->getSession()->setFlash('faildTrancaction', 'مشکلی در پرداخت شما وجود داشت لطفا دوباره امتحان  کنید   ');
             return $this->redirect(['request']);
         }
-   
-   
-   
-			$post=	$_POST;
-			 
-			$respcode = $post['respcode'];
-			$respmsg = $post['respmsg'];
-			$terminalid = $post['terminalid'];
-			$invoiceid = $post['invoiceid'];
-			$amount = $post['amount'];
-			if($respcode==0)
-			{
-				$rrn = $post['rrn'];
-				$cardnumber = $post['cardnumber'];
-				$tracenumber = $post['tracenumber'];
-				$digitalreceipt = $post['digitalreceipt'];
-				$payload = $post['payload'];
-				$datepaid = $post['datepaid'];
-				$issuerbank = $post['issuerbank'];
-				
-				$bankID = \common\models\BankLog::findOne(['orderID' => $invoiceid]);
 
-   
-   
-   
-				$terminal= '61001187';
-				$params ='digitalreceipt='.$digitalreceipt.'&Tid='.$terminal;
-				$ch = curl_init();
-				curl_setopt($ch, CURLOPT_URL, 'https://mabna.shaparak.ir:8081/V1/PeymentApi/Advice');
-				curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
-				curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-				curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-				$res = curl_exec($ch);
-				curl_close($ch);
-				$result = json_decode($res,true);
-				
-				 
-				 if (strtoupper($result['Status']) != 'OK') 
-				 {
-					    \Yii::$app->getSession()->setFlash('faildTrancaction', 'مشکلی در پرداخت شما وجود داشت لطفا دوباره امتحان  کنید   ');
-						return $this->redirect(['request']);	
-				 }
-   
-   
-   
-   
+
+
+        $post = $_POST;
+
+        $respcode = $post['respcode'];
+        $respmsg = $post['respmsg'];
+        $terminalid = $post['terminalid'];
+        $invoiceid = $post['invoiceid'];
+        $amount = $post['amount'];
+        if ($respcode == 0)
+        {
+            $rrn = $post['rrn'];
+            $cardnumber = $post['cardnumber'];
+            $tracenumber = $post['tracenumber'];
+            $digitalreceipt = $post['digitalreceipt'];
+            $payload = $post['payload'];
+            $datepaid = $post['datepaid'];
+            $issuerbank = $post['issuerbank'];
+
+            $bankID = \common\models\BankLog::findOne(['orderID' => $invoiceid]);
+
+
+
+
+            $terminal = '61001187';
+            $params = 'digitalreceipt=' . $digitalreceipt . '&Tid=' . $terminal;
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, 'https://mabna.shaparak.ir:8081/V1/PeymentApi/Advice');
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            $res = curl_exec($ch);
+            curl_close($ch);
+            $result = json_decode($res, true);
+
+
+            if (strtoupper($result['Status']) != 'OK')
+            {
+                \Yii::$app->getSession()->setFlash('faildTrancaction', 'مشکلی در پرداخت شما وجود داشت لطفا دوباره امتحان  کنید   ');
+                return $this->redirect(['request']);
+            }
+
+
+
+
 
             if ($amount == $bankID['amount'])
             {
@@ -797,13 +768,13 @@ class TransactionController extends Controller
                 $bank = new \common\models\BankLog();
                 $bank->id = $bankID['id'];
                 $bank->isNewRecord = false;
-           //     $bank->amount = $bankID['amount'];
-               	$bank->auth = $digitalreceipt;
-				$bank->response = $cardnumber;
+                //     $bank->amount = $bankID['amount'];
+                $bank->auth = $digitalreceipt;
+                $bank->response = $cardnumber;
                 $bank->SystemTraceNo = $tracenumber;
                 $bank->RetrivalRefNo = $rrn;
                 $bank->date = time();
-                $bank->externalPayID = 3; 
+                $bank->externalPayID = 3;
 
                 $bank->update(false, ['auth', 'SystemTraceNo', 'RetrivalRefNo', 'date', 'response', 'externalPayID']);
 
@@ -973,17 +944,18 @@ class TransactionController extends Controller
             return 1;
         }
     }
+
     public function actionTo($key)
     {
 
         $userID = \common\models\Token::getUserID($key, 2);
- 
+
         $txtStatus = Yii::$app->ReadHttpHeader->primary($userID);
 
         $model = new Transaction;
         if ($model->load(Yii::$app->request->post()))
         {
- 
+
 //var_dump($model->amount);
 //die;
             $amount = $model->amount;
@@ -991,7 +963,7 @@ class TransactionController extends Controller
             $model->userID = $userID;
             $model->date = time();
             $model->status = -1;
-			$model->sourceID= $model->mobile;
+            $model->sourceID = $model->mobile;
             $model->sourceTypeID = 7;
             $model->save(false);
 
@@ -1006,141 +978,128 @@ class TransactionController extends Controller
         ]);
     }
 
-
-
-	public function actionResponsetosaderat()
+    public function actionResponsetosaderat()
     {
-      
-	  
-	          Yii::$app->controller->enableCsrfValidation = false;
-				$this->enableCsrfValidation = false;
-	  
-	  
-	  if(!isset($_POST)){
-		  
-		     \Yii::$app->getSession()->setFlash('faild', 'مشکل در دریافت اطلاعات ');
-					 
-                    return $this->redirect(['index']);
-	  }
-			$post=	$_POST;
-			 
-			$respcode = $post['respcode'];
-			$respmsg = $post['respmsg'];
-			$terminalid = $post['terminalid'];
-			$invoiceid = $post['invoiceid'];
-			$amount = $post['amount'];
-			if($respcode==0)
-			{
-				$rrn = $post['rrn'];
-				$cardnumber = $post['cardnumber'];
-				$tracenumber = $post['tracenumber'];
-				$digitalreceipt = $post['digitalreceipt'];
-				$payload = $post['payload'];
-				$datepaid = $post['datepaid'];
-				$issuerbank = $post['issuerbank'];
-				
-				$bankID = \common\models\BankLog::findOne(['orderID' => $invoiceid]);
 
- 
+
+        Yii::$app->controller->enableCsrfValidation = false;
+        $this->enableCsrfValidation = false;
+
+
+        if (!isset($_POST))
+        {
+
+            \Yii::$app->getSession()->setFlash('faild', 'مشکل در دریافت اطلاعات ');
+
+            return $this->redirect(['index']);
+        }
+        $post = $_POST;
+
+        $respcode = $post['respcode'];
+        $respmsg = $post['respmsg'];
+        $terminalid = $post['terminalid'];
+        $invoiceid = $post['invoiceid'];
+        $amount = $post['amount'];
+        if ($respcode == 0)
+        {
+            $rrn = $post['rrn'];
+            $cardnumber = $post['cardnumber'];
+            $tracenumber = $post['tracenumber'];
+            $digitalreceipt = $post['digitalreceipt'];
+            $payload = $post['payload'];
+            $datepaid = $post['datepaid'];
+            $issuerbank = $post['issuerbank'];
+
+            $bankID = \common\models\BankLog::findOne(['orderID' => $invoiceid]);
             {
                 $bank = new \common\models\BankLog();
                 $bank->id = $bankID['id'];
-                $bank->isNewRecord = false; 
-				$bank->auth = $digitalreceipt;
-				$bank->response = $cardnumber;
+                $bank->isNewRecord = false;
+                $bank->auth = $digitalreceipt;
+                $bank->response = $cardnumber;
                 $bank->SystemTraceNo = $tracenumber;
                 $bank->RetrivalRefNo = $rrn;
-                $bank->date = time(); 
+                $bank->date = time();
                 $bank->response = $payload;
 
-                $bank->update(false, ['SystemTraceNo', 'RetrivalRefNo','auth', 'date', 'response', 'amount']);
+                $bank->update(false, ['SystemTraceNo', 'RetrivalRefNo', 'auth', 'date', 'response', 'amount']);
 
                 $transID = \common\models\Transaction::findOne(['id' => $invoiceid]);
- 
                 {
-				$terminal= '61001187';
-				$params ='digitalreceipt='.$digitalreceipt.'&Tid='.$terminal;
-				$ch = curl_init();
-				curl_setopt($ch, CURLOPT_URL, 'https://mabna.shaparak.ir:8081/V1/PeymentApi/Advice');
-				curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
-				curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-				curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-				$res = curl_exec($ch);
-				curl_close($ch);
-				$result = json_decode($res,true);
-				
-				 
-				 if (strtoupper($result['Status']) == 'OK') 
-				 {
+                    $terminal = '61001187';
+                    $params = 'digitalreceipt=' . $digitalreceipt . '&Tid=' . $terminal;
+                    $ch = curl_init();
+                    curl_setopt($ch, CURLOPT_URL, 'https://mabna.shaparak.ir:8081/V1/PeymentApi/Advice');
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
+                    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                    $res = curl_exec($ch);
+                    curl_close($ch);
+                    $result = json_decode($res, true);
+
+
+                    if (strtoupper($result['Status']) == 'OK')
+                    {
 
 
 
-					$model = new \common\models\Transaction();
-                    $model->id = $invoiceid;
-                    $model->isNewRecord = false;
-                    $model->status = 1;
-                    $model->sourceID = $bank->id;
-                    $model->sourceTypeID = 7;
-                    $model->bankLogID = $bank->id;
-                    $model->deleted = 0;
+                        $model = new \common\models\Transaction();
+                        $model->id = $invoiceid;
+                        $model->isNewRecord = false;
+                        $model->status = 1;
+                        $model->sourceID = $bank->id;
+                        $model->sourceTypeID = 7;
+                        $model->bankLogID = $bank->id;
+                        $model->deleted = 0;
 
 
-                    $model->cck = Yii::$app->Security->generate($transID['userID'], $amount, $invoiceid);
-					$model->update(false, ['status', 'sourceTypeID', 'bankLogID', 'cck', 'deleted']);
-
-
-
-
-					$mobile = \common\models\MobilePhone::getMobile($transID['userID']);
+                        $model->cck = Yii::$app->Security->generate($transID['userID'], $amount, $invoiceid);
+                        $model->update(false, ['status', 'sourceTypeID', 'bankLogID', 'cck', 'deleted']);
 
 
 
-                    \Yii::$app->getSession()->setFlash('success', 'پرداخت شما با موفقیت انجام شد  ');
-					 
-                    return $this->redirect(['index']);
-	  
-	  
-	  
-	  
-	  
-	  
-					}
-					
-					else
-					{
-						
-					 
-					\Yii::$app->getSession()->setFlash('faild', $result['Message']);
-					 
-                    return $this->redirect(['index']);
-						
-					}
-				}
-			}
-		}
-		
-		else
-		{
-			
-                    \Yii::$app->getSession()->setFlash('faild', $post['respmsg']);
-					 
-                    return $this->redirect(['index']);
-			
-		}
-	}
+
+                        $mobile = \common\models\MobilePhone::getMobile($transID['userID']);
+
+
+
+                        \Yii::$app->getSession()->setFlash('success', 'پرداخت شما با موفقیت انجام شد  ');
+
+                        return $this->redirect(['index']);
+                    }
+                    else
+                    {
+
+
+                        \Yii::$app->getSession()->setFlash('faild', $result['Message']);
+
+                        return $this->redirect(['index']);
+                    }
+                }
+            }
+        }
+        else
+        {
+
+            \Yii::$app->getSession()->setFlash('faild', $post['respmsg']);
+
+            return $this->redirect(['index']);
+        }
+    }
+
     public function actionResponseto()
     {
         Yii::$app->controller->enableCsrfValidation = false;
         $this->enableCsrfValidation = false;
         $meli = new \common\models\Meli();
 
- 
+
         if (!isset($_POST['OrderId']))
         {
             \Yii::$app->getSession()->setFlash('faildTrancaction', 'مشکلی در پرداخت شما وجود داشت لطفا دوباره امتحان  کنید   ');
             return $this->redirect(['to']);
         }
-		   if ($_POST['ResCode']==-1)
+        if ($_POST['ResCode'] == -1)
         {
             \Yii::$app->getSession()->setFlash('faildTrancaction', 'مشکلی در پرداخت شما وجود داشت لطفا دوباره امتحان  کنید   ');
             return $this->redirect(['index']);

@@ -32,7 +32,8 @@ class Transaction extends \yii\db\ActiveRecord
     const MAX_ADULT_FUNDS = 5000000;
 
     public $goal;
-	public $mobile;
+    public $mobile;
+
     /**
      * @inheritdoc
      */
@@ -47,15 +48,15 @@ class Transaction extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-                [['goal', 'amount'], 'required'],
-                [['userID', 'deleted', 'sourceTypeID', 'date', 'bankLogID','mobile', 'status'], 'integer'],
+            [['goal', 'amount'], 'required'],
+            [['userID', 'deleted', 'sourceTypeID', 'date', 'bankLogID', 'mobile', 'status'], 'integer'],
 //                ['amount', 'integer', 'min' => 6, 'max' => 256],
-				[['amount'], 'integer', 'max' => self::MAX_ADULT_FUNDS, 'min' => self::MIN_ADULT_FUNDS],
-                [['notes', 'token', 'sourceID', 'cck'], 'string', 'max' => 255],
-                [['userID'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['userID' => 'id']],
-                [['sourceTypeID'], 'exist', 'skipOnError' => true, 'targetClass' => Sourcetypes::className(), 'targetAttribute' => ['sourceTypeID' => 'id']],
-                [['bankLogID'], 'exist', 'skipOnError' => true, 'targetClass' => BankLog::className(), 'targetAttribute' => ['bankLogID' => 'id']],
-                ['goal', 'string'],
+            [['amount'], 'integer', 'max' => self::MAX_ADULT_FUNDS, 'min' => self::MIN_ADULT_FUNDS],
+            [['notes', 'token', 'sourceID', 'cck'], 'string', 'max' => 255],
+            [['userID'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['userID' => 'id']],
+            [['sourceTypeID'], 'exist', 'skipOnError' => true, 'targetClass' => Sourcetypes::className(), 'targetAttribute' => ['sourceTypeID' => 'id']],
+            [['bankLogID'], 'exist', 'skipOnError' => true, 'targetClass' => BankLog::className(), 'targetAttribute' => ['bankLogID' => 'id']],
+            ['goal', 'string'],
         ];
     }
 
@@ -77,7 +78,7 @@ class Transaction extends \yii\db\ActiveRecord
             'cck' => 'Cck',
             'deleted' => 'deleted',
             'goal' => 'مقصد',
-			 'mobile' => 'شماره موبایل',
+            'mobile' => 'شماره موبایل',
         ];
     }
 
@@ -114,23 +115,22 @@ class Transaction extends \yii\db\ActiveRecord
         return new TransactionQuery(get_called_class());
     }
 
-    public static function transfering($from, $to, $amount,$wallet=false)
+    public static function transfering($from, $to, $amount, $wallet = false)
     {
         $model = new Transaction;
-		
-		
-		if($wallet = true)
-		{
-			$fromSource = 8;
-			$toSource = 9;
-		}
-		
-		else
-		{
-			$fromSource = 2;
-			$toSource = 3;
-		}
-		
+
+
+        if ($wallet = true)
+        {
+            $fromSource = 8;
+            $toSource = 9;
+        }
+        else
+        {
+            $fromSource = 2;
+            $toSource = 3;
+        }
+
         $connection = \Yii::$app->db;
 
         $transaction = $connection->beginTransaction();
@@ -280,7 +280,7 @@ class Transaction extends \yii\db\ActiveRecord
     public static function checkWithTokenIPBlock($token)
     {
 
-     
+
 
         $query = new Query;
         $query->select('transaction.status,transaction.amount,transaction.id ')
@@ -294,12 +294,12 @@ class Transaction extends \yii\db\ActiveRecord
         if (isset($data['status']))
         {
 
-	 
+
             return $data;
         }
         else
         {
-		
+
 
             return false;
         }
@@ -390,13 +390,10 @@ class Transaction extends \yii\db\ActiveRecord
             return false;
         }
     }
-	
-	
-	
-	
-	public static function getUserIdWithToken($token)
-	{
-		
+
+    public static function getUserIdWithToken($token)
+    {
+
         $query = new Query;
         $query->select('transaction.status,transaction.amount,transaction.id ,transaction.userID')
                 ->from('transaction')
@@ -406,43 +403,37 @@ class Transaction extends \yii\db\ActiveRecord
         $data = $command->queryOne();
 
 
-			if(isset($data['userID']))
-			{
-				return $data;
-			}
-			else
-			{
-				return false;
-			}
-	}
-	
-	public static function checkMethod()
-	
-	
-	{
-	
-			if(isset($_GET['method']))
-				
-			{
-				$method=$_GET['method'];
-			 
-				if($method=='Online')
-				{
-					return true;
-				}
-				
-				else
-				{
-				return false ; 
-				}
-			}
-	 
-			else
-			{
-		   return false ; 
-			}
-		
-	}
+        if (isset($data['userID']))
+        {
+            return $data;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    public static function checkMethod()
+    {
+
+        if (isset($_GET['method']))
+        {
+            $method = $_GET['method'];
+
+            if ($method == 'Online')
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else
+        {
+            return false;
+        }
+    }
 
     public static function getUrlWithToken($token)
     {
@@ -469,9 +460,9 @@ class Transaction extends \yii\db\ActiveRecord
 
         if (isset($data['amount']))
         {
-           $moneyDatabse = $data['amount'];
-		  
-            if ($moneyDatabse == $money*10 and $data['status'] == 1 )
+            $moneyDatabse = $data['amount'];
+
+            if ($moneyDatabse == $money * 10 and $data['status'] == 1)
             {
 
                 return true;

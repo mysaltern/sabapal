@@ -23,11 +23,11 @@ class SiteController extends Controller
             'access' => [
                 'class' => AccessControl::className(),
                 'rules' => [
-                        [
+                    [
                         'actions' => ['login', 'error'],
                         'allow' => true,
                     ],
-                        [
+                    [
                         'actions' => ['logout', 'index'],
                         'allow' => true,
                         'roles' => ['@'],
@@ -63,27 +63,25 @@ class SiteController extends Controller
     public function actionIndex()
     {
 
- 
-		 if ( \Yii::$app->user->id==1)
-				{
-					
-					
-					// yes he is Admin, so redirect page 
-				 
-				}
-			  else // if he is not an Admin then what :P
-				{   // put him out :P Automatically logout. 
-				
-				$id = \Yii::$app->user->id;
-				 Yii::$app->db->createCommand()
-                ->update('user', ['blocked_at' => time()], "id = $id")
-                ->execute();
-					Yii::$app->user->logout();
-					// set error on login page. 
-					\Yii::$app->getSession()->setFlash('error', 'You are not authorized to login Admin\'s penal.<br /> Please use valid Username & Password.<br />Please contact Administrator for details.');
-					//redirect again page to login form.
-					return $this->redirect(['site/login']);
-				}
+
+        if (\Yii::$app->user->id == 1)
+        {
+
+
+            // yes he is Admin, so redirect page
+        }
+        else // if he is not an Admin then what :P
+        {   // put him out :P Automatically logout.
+            $id = \Yii::$app->user->id;
+            Yii::$app->db->createCommand()
+                    ->update('user', ['blocked_at' => time()], "id = $id")
+                    ->execute();
+            Yii::$app->user->logout();
+            // set error on login page.
+            \Yii::$app->getSession()->setFlash('error', 'You are not authorized to login Admin\'s penal.<br /> Please use valid Username & Password.<br />Please contact Administrator for details.');
+            //redirect again page to login form.
+            return $this->redirect(['site/login']);
+        }
 
 
 
