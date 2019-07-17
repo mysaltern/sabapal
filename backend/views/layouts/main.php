@@ -52,6 +52,7 @@ AppAsset::register($this);
                 $menuItems[] = ['label' => 'کاربران', 'url' => ['/user/admin']];
                 $menuItems[] = ['label' => 'کارمزد', 'url' => ['/wage/index']];
                 $menuItems[] = ['label' => 'نوع کارمزد', 'url' => ['/wagedetail/index']];
+                $menuItems[] = ['label' => 'تعیین سود', 'url' => ['/profit/index']];
                 $menuItems[] = '<li>'
                         . Html::beginForm(['/user/security/logout'], 'post')
                         . Html::submitButton(

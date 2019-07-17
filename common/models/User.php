@@ -186,4 +186,10 @@ class User extends ActiveRecord implements IdentityInterface
     {
         $this->password_reset_token = null;
     }
+    // users not blocked and active
+    public static function getUsers()
+    {
+        $userData = \dektrium\user\models\User::find()->where(['blocked_at' => null])->andWhere(['not', ['confirmed_at' => null]])->all();
+        return $userData;
+    }
 }

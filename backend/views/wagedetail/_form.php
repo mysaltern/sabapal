@@ -22,7 +22,7 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'varpercent')->textInput() ?>
 
-    <?= $form->field($model, 'date')->dropDownList(['prompt' => '---- Select Days of Week ----', '0' => 'شنبه', '1' => 'یکشنبه', '2' => 'دوشنبه', '3' => 'سه شنبه', '4' => 'چهارشنبه', '5' => '5شنبه', '6' => 'جمعه']) ?>
+    <?= $form->field($model, 'date')->dropDownList(['0' => '---- تمام ایام هفته ----' , '1' => 'شنبه', '2' => 'یکشنبه', '3' => 'دوشنبه', '4' => 'سه شنبه', '5' => 'چهارشنبه', '6' => '5شنبه', '7' => 'جمعه']) ?>
 
     <?= $form->field($model, 'startprice')->textInput() ?>
 

@@ -4,9 +4,10 @@
 namespace common\models;
 
 
+use common\models\Wagedetail;
 use Yii;
 use yii\db\conditions\BetweenColumnsCondition;
-use common\models\Wagedetail;
+
 
 
 /**
@@ -39,7 +40,7 @@ class Wage extends \yii\db\ActiveRecord
     public function rules()
         {
         return [
-                [['name', 'active', 'erase'], 'required'],
+                [['name', 'active'], 'required'],
                 [['active', 'erase'], 'integer'],
                 [['name'], 'string', 'max' => 255],
         ];
@@ -83,33 +84,38 @@ class Wage extends \yii\db\ActiveRecord
         }
 
 
-    //  function for calculate wage
+    public static function Wage($wagename, $date = false, $price)
+    {
 
-    public function Wage($wagename, $date, $price)
-        {
 
         $wage = Wage::find()->asArray()->where(['name' => $wagename])->one();
-        $wagedetail = Wagedetail::find()->asArray()->where(new BetweenColumnsCondition($price, 'BETWEEN', 'startprice', 'endprice'))->andWhere(['date' => $date, 'wage_id' => $wage['id']])->one();
+        // $wagedetail = Wagedetail::find()->asArray()->where(new BetweenColumnsCondition($price, 'BETWEEN', 'startprice', 'endprice'))->andWhere(['date' => $date, 'wage_id' => $wage['id']])->one();
+        $wagedetails = Wagedetail::find()->where(new BetweenColumnsCondition($price, 'BETWEEN', 'startprice', 'endprice'));
+        if (!$date)
+        {
+
+            $wagedetails->andWhere(['wage_id' => $wage['id']]);
+        }else{
+            $wagedetails ->andWhere(['date' => $date, 'wage_id' => $wage['id']]);
+        }
+
+        $wagedetail = $wagedetails->asArray()->one();
 
         $fixpercent = $wagedetail ['fixpercent'];
         $varpercent = $wagedetail ['varpercent'];
 
-        if ($fixpercent)
-            {
+        if ($fixpercent) {
             $pricewhitefixpercent = $price - $fixpercent;
             return " Fix Wage : $fixpercent  ,<br>  Price White Fix Wage  :  $pricewhitefixpercent ";
-            }
-        elseif ($varpercent)
-            {
-            $pricewhitevarpercent = $price - ( $price * ( $varpercent / 100));
+        } elseif ($varpercent) {
+            $pricewhitevarpercent = $price - ($price * ($varpercent / 100));
             return "Var Wage : %$varpercent ,<br> Price White Var Wage :  $pricewhitevarpercent";
-            }
-        else
-            {
+        } else {
             return "No Wage ";
-            }
-
         }
+
+    }
+
 
 
     }

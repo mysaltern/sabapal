@@ -1,4 +1,6 @@
 <?php
+
+use yii\bootstrap\Html;
 use yii\helpers\Url;
 
 
@@ -34,13 +36,13 @@ return [
                 return 'غیرفعال';
             }
         },
-     //   'filter' => array("0" => "No", "1" => "Yes"),
-        //  'visible' => \Yii::$app->user->can('posts.owner.view'),
+
     ],
   //  [
      //   'class'=>'\kartik\grid\DataColumn',
    //     'attribute'=>'erase',
   //  ],
+
     [
         'class' => 'kartik\grid\ActionColumn',
         'dropdown' => false,
@@ -56,6 +58,25 @@ return [
                           'data-toggle'=>'tooltip',
                           'data-confirm-title'=>'Are you sure?',
                           'data-confirm-message'=>'Are you sure want to delete this item'],
+    ],
+    [
+        'class' => 'yii\grid\ActionColumn',
+        'template' => '{wage}',
+
+
+        'buttons' => ['view' => function($url, $model)
+        {
+            return Html::a('<span class = "btn btn-sm btn-default"><b class = "fa fa-search-plus"></b></span>', ['view', 'id' => $model['id']], ['title' => 'View', 'id' => 'modal-btn-view']);
+        },
+
+
+            'wage' => function($id, $model)
+            {
+                $wagedetail = "      <a class='btn btn-default waves-effect' href='../wagedetail/index?WagedetailSearch[wage_id]=$model->id' title='Wage Detail' role=''><i class='glyphicon glyphicon-th'></i></a>";
+                return  $wagedetail;
+
+            },
+        ]
     ],
 
 ];
