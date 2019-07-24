@@ -1,7 +1,7 @@
 <?php
 
 
-namespace common\models;
+namespace backend\models;
 
 
 use Yii;
@@ -50,9 +50,9 @@ class TransactionSearch extends Transaction
      */
     public function search($params)
         {
-        $userID = \Yii::$app->user->id;
 
-        $query = Transaction::find()->where(['deleted' => 0, 'userID' => $userID])->orderBy('id desc');
+
+        $query = Transaction::find()->where(['deleted' => 0])->orderBy('id desc');
 
         // add conditions that should always apply here
 
