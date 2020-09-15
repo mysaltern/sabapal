@@ -8,7 +8,7 @@ class ProductController extends \yii\web\Controller
     public function actionIndex()
     {
 
-        $insta = \InstagramScraper\Instagram::withCredentials('miladpro', "momibs450Asada2@");
+        $insta = \InstagramScraper\Instagram::withCredentials('miladpro', "");
 
         $insta->login();
         $account = $insta->getMediasFromFeed("ho3einroshan");
