@@ -18,8 +18,8 @@ use Yii;
 class saltern extends \yii\db\ActiveRecord
 {
 
-    public $username = "mysaltern";
-    public $password = "momibs450Asada@";
+    public $username = "";
+    public $password = "";
     public $from = "50004000417687";
 
     public function actionText($sex, $name, $lastName, $text, $job)
